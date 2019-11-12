@@ -1,10 +1,10 @@
 const express = require('express');
-const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const PORT = process.env.PORT || 3030;
-
 const Web3Utils = require('web3-utils');
+
+const PORT = process.env.PORT || 3030;
+const app = express();
 
 let deviceFile;
 fs.readFile('./deviceData.json', 'utf8', (error, data) => {
@@ -110,4 +110,3 @@ app.get((req, res) => {
 
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-
