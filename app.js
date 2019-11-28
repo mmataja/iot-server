@@ -2,8 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const Web3Utils = require('web3-utils');
-const crypto = require('crypto');
-const sshKeyToPEM = require('ssh-key-to-pem');
+const NodeRSA = require('node-rsa');
 
 const PORT = process.env.PORT || 3030;
 const app = express();
@@ -43,9 +42,8 @@ app.post('/register', async (req, res) => {
 	const { encryptData } = req.body;
 
 	const privateKey = await fs.readFileSync('./private.key', 'utf8');
-	const sshPrivateKey = sshKeyToPEM(privateKey);
-
-	const decryptData = crypto.privateDecrypt(sshPrivateKey, encryptData);
+	const key = new NodeRSA(privateKey);
+	const decryptData = key.decrypt(encryptData, 'utf8')
 
 	console.log("Decrypt DATA.....", decryptData);
 
