@@ -1,1 +1,7 @@
-{"id":"0","name":"Baterija","owner":"CISCO","firmware":"v.15-67","blockNumber":"38","contractAddress":"fslfkjasdfc92r93u0psfa0u3jr9hwsdcnaue8qw43ztfclaksjdw875rzwsefnfc84zr4w398fnclkyjdhfw84zrfwe8sncjdf34zrw"}
+{ "id":"0",
+  "name":"Baterija",
+  "owner":"CISCO",
+  "firmware":"v.15-67",
+  "blockNumber":"38",
+  "contractAddress":"fslfkjasdfc92r93u0psfa0u3jr9hwsdcnaue8qw43ztfclaksjdw875rzwsefnfc84zr4w398fnclkyjdhfw84zrfwe8sncjdf34zrw"
+}
