@@ -1,8 +1,10 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const Web3Utils = require('web3-utils');
 const NodeRSA = require('node-rsa');
+const bodyParser = require('body-parser');
+const express = require('express');
+const fs = require('fs');
+
+const Personal = require('web3-eth-personal');
+const personal = new Personal('http://127.0.0.1:7545');
 
 const PORT = process.env.PORT || 3030;
 const app = express();
@@ -43,35 +45,44 @@ app.post('/register', async (req, res) => {
 
 	const privateKey = await fs.readFileSync('./private.key', 'utf8');
 	const key = new NodeRSA(privateKey);
-	const decryptData = key.decrypt(encryptData, 'utf8')
+	const decryptData = JSON.parse(key.decrypt(encryptData, 'utf8'));
 
-	console.log("Decrypt DATA.....", decryptData);
+	console.log("Decrypt DATA.....", decryptData.account);
+	console.log("DEVICE FILE....", deviceFile);
 
-	const dataToHash = JSON.stringify({
+	// const selectedWalletAddress = await web3.eth.getAccounts();
+
+	const dataThatWasSigned = {
 		deviceOwner: deviceFile.owner,
 		deviceName: deviceFile.name,
 		deviceFirmware: deviceFile.firmware,
-		publicKey
-	});
+		account: decryptData.account,
+	};
+	console.log("DATA THAT WAS SIGNED...", dataThatWasSigned);
+
+	const testWeb3 = await personal.ecRecover(JSON.stringify(dataThatWasSigned), decryptData.signature);
+	console.log(testWeb3);
+
+	// const accountThatSignedTheMessage = await web3.eth.personal.ecRecover(dataThatWasSigned, decryptData.signature).then((data) => console.log(data));
+	// console.log(accountThatSignedTheMessage);
 	
-	
-	const deviceSignature = Web3Utils.sha3(dataToHash);
-	
-	if (reqData.signature !== deviceSignature) {
-		return res.status(422).send('Signatures doesn\'t match.');
-	}
+	// if (accountThatSignedTheMessage !== decryptData.account) {
+	// 	return res.status(422).send('Signatures doesn\'t match.');
+	// }
 	
 	const deviceData = { 
-		...deviceFile,
-		id: reqData.id,
-		blockNumber: reqData.blockNumber,
-		contractAddress: reqData.contractAddress,
+		...dataThatWasSigned,
+		id: decryptData.id,
+		blockNumber: decryptData.blockNumber,
+		contractId: decryptData.contract,
 	};
+
+	console.log("DEVICE DATA....", deviceData);
 	
 	
-	await fs.writeFile('./deviceData.json', JSON.stringify(deviceData), error => {
-		if (error) throw error;
-	});
+	// await fs.writeFile('./deviceData.json', JSON.stringify(deviceData), error => {
+	// 	if (error) throw error;
+	// });
 	
 	return res.status(200).send("Device successfully registered.");
 });
@@ -96,9 +107,6 @@ app.post('/update', (req, res) => {
 		
 		deviceData[key] = data[key]; 
 	})
-	
-	// TODO:
-	// napraviti ovdje dekripciju podatka sa private key-em
 	
 	fs.writeFile('./deviceData.json', JSON.stringify(deviceData), error => {
 		if (error) throw error;
