@@ -7,8 +7,6 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(
 	Web3.currentProvider || Web3.givenProvider || 'http://127.0.0.1:7545'));
 
-const ethUtil = require('ethjs-util');
-	
 const PORT = process.env.PORT || 3030;
 const app = express();
 
