@@ -2,11 +2,11 @@ const NodeRSA = require('node-rsa');
 const fs = require('fs');
 const path = require('path');
 
-const { web3 } = require('../utils');
 const deviceFile = require('../deviceData.json');
+const { web3 } = require('../utils');
 
 module.exports = async (encryptData) => {
-  const privateKey = await fs.readFileSync(path.resolve('./private.key'), 'utf8');
+  const privateKey = fs.readFileSync(path.resolve('./private.key'), 'utf8');
 	const key = new NodeRSA(privateKey);
 	const decryptData = JSON.parse(key.decrypt(encryptData, 'utf8'));
 
@@ -21,8 +21,8 @@ module.exports = async (encryptData) => {
   
 	if (deviceSign.signature !== decryptData.signature) {
 		return false;
-	}
-
+  }
+  
 	const deviceData = JSON.stringify({
 		name: deviceDataToSign.deviceName,
 		owner: deviceDataToSign.deviceOwner,
@@ -30,11 +30,9 @@ module.exports = async (encryptData) => {
 		id: decryptData.id,
 		blockNumber: decryptData.blockNumber,
 		contractId: decryptData.contract,
-	});
-
-	fs.writeFile('../deviceData.json', deviceData, error => {
-		if (error) throw error;
   });
+  
+  fs.writeFileSync(path.resolve('./deviceData.json'), deviceData, { encoding: 'utf8'});
   
   return true;
 }
